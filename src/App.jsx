@@ -30,7 +30,8 @@ import AddUserForm from './components/AddUserForm';
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Signup/>} />
+      <Route path="/" element={<Signup />} />
+      <Route path="/login" element={<Login />} />   {/* ✅ Add this line */}
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/users" element={<AddUserForm />} />
       
