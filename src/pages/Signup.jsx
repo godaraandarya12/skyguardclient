@@ -3,7 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { signup, fetchRtpsOptions } from '../api/auth';
 
 export default function Signup() {
-  const [form, setForm] = useState({ name: '', id: '', password: '', rtps: '' });
+  const [form, setForm] = useState({
+    name: '',
+    email: '', // changed from 'id'
+    password: '',
+    rtps: '', // single selected RTPS
+  });
+
   const [rtpsOptions, setRtpsOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -23,7 +29,7 @@ export default function Signup() {
   const validateForm = () => {
     const newErrors = {};
     if (!form.name) newErrors.name = 'Name is required';
-    if (!form.id) newErrors.id = 'User ID is required';
+    if (!form.email) newErrors.email = 'Email is required';
     if (!form.password) newErrors.password = 'Password is required';
     else if (form.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     if (!form.rtps) newErrors.rtps = 'Please select an RTPS';
@@ -37,18 +43,26 @@ export default function Signup() {
 
   const handleSignup = async () => {
     if (!validateForm()) return;
+
     try {
-      await signup(form);
+      await signup({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        rtpsNames: [form.rtps], // Ensure it's passed as an array
+      });
+
       alert('Signup successful! Please login.');
       navigate('/login');
     } catch (err) {
-      alert('Signup failed: ' + (err.response?.data?.message || err.message));
+      console.error('Signup failed:', err);
+      alert('Signup failed: ' + (err.response?.data?.error || err.message));
     }
   };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-gray-50 to-white">
-      <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md border border-gray-200 animate-fade-in">
+      <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md border border-gray-200">
         <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Create Account</h2>
 
         <input
@@ -57,19 +71,19 @@ export default function Signup() {
           placeholder="Full Name"
           value={form.name}
           onChange={handleChange}
-          className={`w-full mb-3 p-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          className={`w-full mb-3 p-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none`}
         />
         {errors.name && <p className="text-red-500 text-sm mb-2">{errors.name}</p>}
 
         <input
           type="text"
-          name="id"
-          placeholder="User ID"
-          value={form.id}
+          name="email"
+          placeholder="Email"
+          value={form.email}
           onChange={handleChange}
-          className={`w-full mb-3 p-3 border ${errors.id ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          className={`w-full mb-3 p-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none`}
         />
-        {errors.id && <p className="text-red-500 text-sm mb-2">{errors.id}</p>}
+        {errors.email && <p className="text-red-500 text-sm mb-2">{errors.email}</p>}
 
         <input
           type="password"
@@ -77,7 +91,7 @@ export default function Signup() {
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
-          className={`w-full mb-3 p-3 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          className={`w-full mb-3 p-3 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none`}
         />
         {errors.password && <p className="text-red-500 text-sm mb-2">{errors.password}</p>}
 
@@ -85,7 +99,7 @@ export default function Signup() {
           name="rtps"
           value={form.rtps}
           onChange={handleChange}
-          className={`w-full mb-4 p-3 border ${errors.rtps ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          className={`w-full mb-4 p-3 border ${errors.rtps ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-white focus:outline-none`}
         >
           <option value="">Select RTPS</option>
           {rtpsOptions.map((opt) => (
