@@ -16,6 +16,8 @@ import {
   AreaChart, Area, RadialBarChart, RadialBar, PolarAngleAxis
 } from 'recharts';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setDevice } from '../store/deviceSlice';
 
 // Light theme color scheme
 const colors = {
@@ -563,11 +565,24 @@ export default function Dashboard() {
   const [errorHealth, setErrorHealth] = useState(null);
   const [errorNotifications, setErrorNotifications] = useState(null);
 
-  const deviceId = 'GAST2ccf672af4ea';
+  const deviceId = localStorage.getItem("device") || sessionStorage.getItem("device");
+  const deviceIP = localStorage.getItem("DeviceIp") || sessionStorage.getItem("DeviceIp");
 
+  useEffect(() => {
+    if (deviceIP && deviceId) {
+      fetchHealthData();
+    } else {
+      console.warn("Device IP or ID is missing from storage.");
+      setLoadingHealth(false);
+    }
+  }, []);
   const fetchHealthData = async () => {
+    console.log(`http://${deviceIP}:8000/health`);
+    console.log(`Device ID: ${deviceId}`);
     try {
-      const res = await axios.get('http://100.65.26.31:8000/health');
+      const res = await axios.get(`http://${deviceIP}:8000/health`);
+      
+      
       setSystemData(res.data);
       setErrorHealth(null);
     } catch (err) {
@@ -617,7 +632,7 @@ export default function Dashboard() {
     notificationData.forEach(item => {
       const dateObj = new Date(item.event_date);
       const date = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      if (!dateMap[date]) dateMap[date] = { name: date, Fire: 0, Intrusion: 0, Motion: 0, fullDate: dateObj };
+      if (!dateMap[date]) dateMap[date] = { name: date, Fire: 0,  Motion: 0, fullDate: dateObj };
       dateMap[date][item.type] = parseInt(item.total_notifications);
     });
     return Object.values(dateMap).sort((a, b) => a.fullDate - b.fullDate);
@@ -625,7 +640,7 @@ export default function Dashboard() {
 
   const pieChartData = useMemo(() => {
     if (!notificationData) return null;
-    const typeMap = { Fire: 0, Intrusion: 0, Motion: 0 };
+    const typeMap = { Fire: 0,  Motion: 0 };
     notificationData.forEach(item => {
       typeMap[item.type] += parseInt(item.total_notifications);
     });
@@ -850,10 +865,7 @@ export default function Dashboard() {
                           <stop offset="5%" stopColor={colors.danger} stopOpacity={0.8}/>
                           <stop offset="95%" stopColor={colors.danger} stopOpacity={0}/>
                         </linearGradient>
-                        <linearGradient id="colorIntrusion" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={colors.warning} stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor={colors.warning} stopOpacity={0}/>
-                        </linearGradient>
+                      
                         <linearGradient id="colorMotion" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor={colors.primary} stopOpacity={0.8}/>
                           <stop offset="95%" stopColor={colors.primary} stopOpacity={0}/>
@@ -879,14 +891,7 @@ export default function Dashboard() {
                         fill="url(#colorFire)" 
                         strokeWidth={2}
                       />
-                      <Area 
-                        type="monotone" 
-                        dataKey="Intrusion" 
-                        stroke={colors.warning} 
-                        fillOpacity={1} 
-                        fill="url(#colorIntrusion)" 
-                        strokeWidth={2}
-                      />
+                    
                       <Area 
                         type="monotone" 
                         dataKey="Motion" 

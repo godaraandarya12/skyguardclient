@@ -5,11 +5,15 @@ import {
 } from 'react-icons/fi';
 
 const WeeklyTimerControl = () => {
+  const deviceId = localStorage.getItem('devices')|| sessionStorage.getItem('devices');
   // Initial state for each day's timer settings
+  const deviceIp = localStorage.getItem('DeviceIp')|| sessionStorage.getItem('DeviceIp');
+  console.log(deviceIp);
+  console.log(deviceId);
   const initialDayState = {
     enabled: false,
-    startTime: '08:00',
-    stopTime: '17:00'
+    startTime: '18:00',
+    stopTime: '07:00'
   };
 
   // State for all days
@@ -47,9 +51,10 @@ const WeeklyTimerControl = () => {
   // Fetch schedule from API
   useEffect(() => {
     const fetchSchedule = async () => {
-      const deviceId = 'device123';
+      
       try {
-        const response = await fetch(`http://localhost:3000/api/schedules?device_id=${deviceId}`);
+        const response = await fetch(`http://${deviceIp}:3000/api/schedules?device_id=${deviceId}`);
+        console.log(response);
         const data = await response.json();
         if (Array.isArray(data)) {
           const loadedDays = {};
@@ -118,7 +123,7 @@ const WeeklyTimerControl = () => {
     setIsLoading(true);
     setApiResponse('');
     setSaveCooldown(true);
-    const deviceId = 'device123';
+    
     const schedules = Object.entries(days).map(([day, config]) => ({
       day: day.charAt(0).toUpperCase() + day.slice(1),
       enabled: config.enabled,
@@ -152,7 +157,7 @@ const WeeklyTimerControl = () => {
     setIsLoading(true);
     setApiResponse('');
     try {
-      const response = await fetch('http://your-raspberry-pi-ip:port/api/restart', {
+      const response = await fetch(`http://${deviceIp}:8000/api/restart`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

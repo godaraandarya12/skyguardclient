@@ -1,99 +1,212 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { NavLink } from "react-router-dom";
-import { 
-  FiHome, 
-  FiUsers, 
-  FiSettings, 
-  FiCalendar,
-  FiVideo,
-  FiFileText,
-  FiBarChart2,
-  FiAlertCircle,
-  FiHardDrive,
-  FiShield
+import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { NavLink, useLocation } from "react-router-dom";
+import {
+  FiHome, FiUsers, FiSettings, FiCalendar, FiVideo,
+  FiAlertCircle, FiHardDrive, FiMenu, FiX,
+  FiChevronRight, FiCloud, FiPower
 } from "react-icons/fi";
-import WeatherWidget from "./WeatherWidget";
+import { RiLiveLine } from "react-icons/ri";
 import UserProfileCard from "./UserProfileCard";
 
 export default function Sidebar() {
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const location = useLocation();
 
-  const navItems = [
-    { name: "Dashboard", path: "/", icon: <FiHome size={18} /> },
-    { name: "Users", path: "/users", icon: <FiUsers size={18} /> },
-    { name: "Recordings", path: "/recordings", icon: <FiVideo size={18} /> },
+      
+      
+  // In a real app, get this from authentication/authorization logic
+  const userRole = localStorage.getItem('role')||sessionStorage.getItem('role');
+
+  // Handle screen resizing for responsive sidebar
+  const handleResize = useCallback(() => {
+    setIsDesktop(window.innerWidth >= 768);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize]);
+
+  // Close sidebar on route change for mobile
+  useEffect(() => {
+    if (!isDesktop) setIsOpen(false);
+  }, [location.pathname, isDesktop]);
+
+  // Full navigation list
+  const allNavItems = [
+    { name: "Dashboard", path: "/dashboard", icon: <FiHome size={18} />, pulse: true },
+    {
+      name: "User Management",
+      path: "/users",
+      icon: <FiUsers size={18} />,
+      roles: ["admin"], // only visible for these roles
+      submenu: [
+        { name: "All Users", path: "/users/all", icon: <FiUsers size={14} /> },
+        { name: "Add Users", path: "/users/add", icon: <FiSettings size={14} /> }
+      ]
+    },
+    {
+      name: "Media Center",
+      icon: <FiVideo size={18} />,
+      submenu: [
+        { name: "Recordings", path: "/recordings", icon: <FiVideo size={14} /> },
+        { name: "Live Streams", path: "/streams", icon: <RiLiveLine size={14} /> }
+      ]
+    },
     { name: "Scheduler", path: "/scheduler", icon: <FiCalendar size={18} /> },
-   { name: "Streaming", path: "/stream", icon: <FiBarChart2 size={18} /> },
-
-    { name: "Alerts", path: "/notifications", icon: <FiAlertCircle size={18} /> },
-    // { name: "Storage", path: "/storage", icon: <FiHardDrive size={18} /> },
-    // { name: "Security", path: "/security", icon: <FiShield size={18} /> },
-    // { name: "Documents", path: "/documents", icon: <FiFileText size={18} /> },
-     { name: "Settings", path: "/settings", icon: <FiSettings size={18} /> },
-     { name: "Devices", path: "/devices", icon: <FiHardDrive size={18} /> }
+    { name: "Alerts", path: "/notifications", icon: <FiAlertCircle size={18} />, urgent: true },
+    {
+      name: "Device Hub",
+      path: "/devices",
+      icon: <FiHardDrive size={18} />,
+      status: "online",
+      roles: ["admin"] // only visible for these roles
+    },
+    { name: "System Settings", path: "/settings", icon: <FiSettings size={18} /> }
   ];
 
+  // Filter by role
+  const navItems = allNavItems.filter(item => {
+    return !item.roles || item.roles.includes(userRole);
+  });
+
+  const toggleSubmenu = (index) => {
+    setActiveSubmenu(activeSubmenu === index ? null : index);
+  };
+
   return (
-    <motion.div
-      initial={{ x: -300 }}
-      animate={{ x: 0 }}
-      exit={{ x: -300 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="fixed top-0 left-0 h-full w-80 z-40 md:relative md:translate-x-0 flex flex-col"
-    >
-      {/* Background Layer */}
-      <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-r border-white/20 dark:border-gray-700/30" />
-
-      {/* Content Layer */}
-      <div className="relative z-10 h-full flex flex-col p-6">
-
-        {/* Logo / Brand */}
-        <motion.div
-          className="flex items-center space-x-3 mb-10"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-            <motion.div whileHover={{ rotate: 15 }}>
-              <span className="text-white font-bold">SG</span>
-            </motion.div>
+    <>
+      {/* Mobile Header */}
+      {!isDesktop && (
+        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-transparent transparent:bg-transparent-900  border-gray-200  ">
+          <div className="flex items-center space-x-2">
+            
           </div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent">
-            Sky Guard
-          </h2>
-        </motion.div>
+          <button
+            aria-label="Open Sidebar"
+            onClick={() => setIsOpen(true)}
+            className="p-2 rounded-lg hover:bg-white-100 dark:hover:bg-gray-800"
+          >
+            <FiMenu size={22} />
+          </button>
+        </header>
+      )}
 
-        
+      {/* Backdrop for Mobile */}
+      <AnimatePresence>
+        {!isDesktop && isOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <motion.aside
+        role="navigation"
+        aria-label="Main Sidebar"
+        initial={{ x: -320 }}
+        animate={{ x: isDesktop || isOpen ? 0 : -320 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="fixed top-0 left-0 h-screen w-80 z-50 flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-2xl"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      >
+        {/* Logo & Close */}
+        <div className="flex items-center justify-between p-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">SG</div>
+            <div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent">Sky Guard</h2>
+              <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                <FiCloud size={12} className="mr-1" /> v1.0.0 <span className="mx-1">•</span> PRO
+              </div>
+            </div>
+          </div>
+          {!isDesktop && (
+            <button
+              aria-label="Close Sidebar"
+              onClick={() => setIsOpen(false)}
+              className="p-2 rounded-lg hover:bg-white-100 white:hover:bg-white-800"
+            >
+            
+            </button>
+          )}
+        </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto">
-          <ul className="space-y-1">
-            {navItems.map((item) => (
+        <nav className="flex-1 overflow-y-auto px-4 py-2">
+          <ul className="space-y-1.5">
+            {navItems.map((item, index) => (
               <li key={item.name}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) => 
-                    `flex items-center px-4 py-3 rounded-xl transition-all ${isActive 
-                      ? 'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium' 
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'}`
-                  }
-                  onClick={() => setActiveItem(item.name)}
-                >
-                  <span className="mr-3 opacity-80">{item.icon}</span>
-                  <span>{item.name}</span>
-                </NavLink>
+                {item.submenu ? (
+                  <>
+                    <button
+                      aria-expanded={activeSubmenu === index}
+                      onClick={() => toggleSubmenu(index)}
+                      className={`flex items-center justify-between w-full px-4 py-3 rounded-xl ${activeSubmenu === index ? "bg-blue-50 dark:bg-gray-800 text-blue-600 dark:text-blue-400" : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"}`}
+                    >
+                      <span className="flex items-center">{item.icon}<span className="ml-3">{item.name}</span></span>
+                      <motion.div animate={{ rotate: activeSubmenu === index ? 90 : 0 }}>
+                        <FiChevronRight size={16} />
+                      </motion.div>
+                    </button>
+                    <AnimatePresence>
+                      {activeSubmenu === index && (
+                        <motion.ul
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="pl-8 mt-1 space-y-1"
+                        >
+                          {item.submenu.map((sub) => (
+                            <li key={sub.name}>
+                              <NavLink
+                                to={sub.path}
+                                className={({ isActive }) =>
+                                  `flex items-center px-4 py-2.5 rounded-lg text-sm ${isActive ? "bg-blue-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400" : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"}`
+                                }
+                              >
+                                {sub.icon}<span className="ml-2">{sub.name}</span>
+                              </NavLink>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
+                  </>
+                ) : (
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center px-4 py-3 rounded-xl ${isActive ? "bg-blue-50 dark:bg-gray-800 text-blue-600 dark:text-blue-400" : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"}`
+                    }
+                  >
+                    {item.icon}<span className="ml-3">{item.name}</span>
+                  </NavLink>
+                )}
               </li>
             ))}
           </ul>
         </nav>
 
-        {/* Footer Widgets */}
-        <div className="mt-auto pt-6 border-t border-gray-200/50 dark:border-gray-700/30 space-y-4">
-          <WeatherWidget />
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800">
           <UserProfileCard />
+          <div className="mt-4 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span>© 2025 Sky Guard</span>
+           
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.aside>
+    </>
   );
 }

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FiSettings, FiTrash2, FiPower, FiEdit, FiPlus, FiSearch } from 'react-icons/fi';
 import { FaVideo, FaCamera } from 'react-icons/fa';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 
 const DevicesPage = () => {
+   const [searchParams] = useSearchParams();
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +23,14 @@ const DevicesPage = () => {
     rtspUrl2: '',
     ipAddress: ''
   });
-
+const searchedDeviceId = searchParams.get("deviceId");
+  
+ // Set search term from URL param only on mount or when param changes
+  useEffect(() => {
+    if (searchedDeviceId) {
+      setSearchTerm(searchedDeviceId);
+    }
+  }, [searchedDeviceId]);
   useEffect(() => {
     const fetchData = async () => {
       try {

@@ -96,7 +96,7 @@ export default function UserProfileCard() {
 
       {/* User Profile Card */}
       <NavLink
-        to="/profile"
+        
         className="flex items-center space-x-3 p-3 rounded-xl bg-white/50 dark:bg-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-700/80 shadow-sm hover:shadow-md transition-all duration-300 group"
       >
         <motion.div
@@ -105,7 +105,7 @@ export default function UserProfileCard() {
           className="relative w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 overflow-hidden shadow-md ring-2 ring-offset-2 ring-white dark:ring-offset-gray-900"
         >
           <img
-            src="https://randomuser.me/api/portraits/women/44.jpg"
+            src="https://randomuser.me/api/portraits/lego/3.jpg"
             alt={user.name}
             className="w-full h-full object-cover"
           />

@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Notiflix from 'notiflix';
+import { useDispatch } from 'react-redux';
+import { setDevice } from '../store/deviceSlice';
 
 export default function NZLogin() {
+   const dispatch = useDispatch();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,6 +21,24 @@ export default function NZLogin() {
   const handleForgotPassword = () => {
     navigate('/forgot-password');
   };
+  async function fetchAndStoreDevice(deviceId) {
+  try {
+    const response = await fetch(`http://localhost:3000/api/DeviceRegister/${deviceId}`);
+    const result = await response.json();
+
+    if (result.status === "success" && result.data && result.data.device) {
+      // Store the device info in sessionStorage
+      sessionStorage.setItem("DeviceIp", result.data.device.ip_address)||localStorage.setItem("DeviceIp", result.data.device.ip_address);
+            dispatch(setDevice({ id: deviceId, ip: sessionStorage.setItem("DeviceIp", result.data.device.ip_address)||localStorage.setItem("DeviceIp", result.data.device.ip_address) }));
+
+      console.log("Device info stored successfully.");
+    } else {
+      console.error("Invalid API response:", result);
+    }
+  } catch (error) {
+    console.error("Failed to fetch device info:", error);
+  }
+}
 
   useEffect(() => {
     // ⏱ Update NZ time
@@ -95,12 +117,14 @@ export default function NZLogin() {
       storage.setItem('role', user.role);
       storage.setItem('email', user.email);
       storage.setItem('name', user.name);
-      
+      storage.setItem('device', user.devices[0]);
+
+    
       debugger;
       Notiflix.Notify.success('Welcome back, explorer 🌏');
       Notiflix.Loading.remove();
       console.log('Login successful:', user);
-      
+      await fetchAndStoreDevice(user.devices);
       navigate('/dashboard');
     } catch (err) {
       Notiflix.Loading.remove();
