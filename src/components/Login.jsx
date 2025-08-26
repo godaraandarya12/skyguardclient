@@ -4,7 +4,7 @@ import axios from 'axios';
 import Notiflix from 'notiflix';
 import { useDispatch } from 'react-redux';
 import { setDevice } from '../store/deviceSlice';
-
+import Logo from '../assets/logo.png'; // Adjust the path as necessary
 export default function NZLogin() {
    const dispatch = useDispatch();
 
@@ -21,22 +21,34 @@ export default function NZLogin() {
   const handleForgotPassword = () => {
     navigate('/forgot-password');
   };
-  async function fetchAndStoreDevice(deviceId) {
+ async function fetchAndStoreDevice(deviceId) {
   try {
-    const response = await fetch(`http://localhost:3000/api/DeviceRegister/${deviceId}`);
+    const response = await fetch(`http://100.66.89.46:3000/api/DeviceRegister/${deviceId}`);
     const result = await response.json();
 
     if (result.status === "success" && result.data && result.data.device) {
-      // Store the device info in sessionStorage
-      sessionStorage.setItem("DeviceIp", result.data.device.ip_address)||localStorage.setItem("DeviceIp", result.data.device.ip_address);
-            dispatch(setDevice({ id: deviceId, ip: sessionStorage.setItem("DeviceIp", result.data.device.ip_address)||localStorage.setItem("DeviceIp", result.data.device.ip_address) }));
+      const device = result.data.device;
+
+      // Store device info in both storages
+      sessionStorage.setItem("DeviceIp", device.ip_address);
+      localStorage.setItem("DeviceIp", device.ip_address);
+      sessionStorage.setItem("rtsp_url1", device.rtsp_url1);
+      localStorage.setItem("rtsp_url1", device.rtsp_url1);
+      sessionStorage.setItem("rtsp_url2", device.rtsp_url2);
+      localStorage.setItem("rtsp_url2", device.rtsp_url2);
+
+      // Dispatch Redux action
+      dispatch(setDevice({ id: deviceId, ip: device.ip_address }));
 
       console.log("Device info stored successfully.");
+      return true; // indicate success
     } else {
       console.error("Invalid API response:", result);
+      return false; // indicate failure
     }
   } catch (error) {
     console.error("Failed to fetch device info:", error);
+    return false;
   }
 }
 
@@ -103,7 +115,7 @@ export default function NZLogin() {
     Notiflix.Loading.circle('Authenticating...');
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
+      const response = await axios.post('http://100.66.89.46:3000/api/auth/login', {
         email,
         password
       });
@@ -121,11 +133,19 @@ export default function NZLogin() {
 
     
       debugger;
-      Notiflix.Notify.success('Welcome back, explorer 🌏');
-      Notiflix.Loading.remove();
-      console.log('Login successful:', user);
-      await fetchAndStoreDevice(user.devices);
-      navigate('/dashboard');
+   const success = await fetchAndStoreDevice(user.devices);
+if (success) {
+  Notiflix.Notify.success('Welcome back, explorer 🌏');
+  Notiflix.Loading.remove();
+  console.log('Login successful:', user);
+  navigate('/dashboard'); // only navigate if API succeeded
+} else {
+  Notiflix.Notify.failure('Device Not Registered.');
+   Notiflix.Loading.remove();
+   storage.clear();
+}
+      
+      
     } catch (err) {
       Notiflix.Loading.remove();
       Notiflix.Notify.failure('Invalid credentials. Please try again.');
@@ -167,22 +187,30 @@ export default function NZLogin() {
         <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-float3"></div>
       </div>
 
-      <div className="w-full max-w-md z-10">
-        <div className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-lg border border-white/20">
-          <div className="flex flex-col items-center mb-8">
-            <div className="relative">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center shadow-md">
-                <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
-                </svg>
-              </div>
-              <div className="absolute -bottom-2 -right-2 bg-yellow-400 rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
-                <div className="w-2 h-2 bg-black rounded-full"></div>
-              </div>
-            </div>
-            <h1 className="mt-4 text-2xl font-bold text-gray-800">Aotearoa Secure</h1>
-            <p className="text-sm text-gray-500 mt-1">Explore New Zealand's wonders</p>
-          </div>
+    <div className="w-full max-w-md z-10">
+  <div className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/20 transition-transform transform hover:scale-105 duration-300">
+    <div className="flex flex-col items-center mb-6">
+      <div className="relative">
+        {/* Logo Container with Gradient & Floating Animation */}
+        <div className="w-20 h-20 bg-gradient-to-br rounded-2xl flex items-center justify-center shadow-xl animate-bounce-slow">
+          <img 
+            src={Logo} 
+            alt="Logo" 
+            className="h-full w-full"
+          />
+        </div>
+        {/* Decorative Accent Dot */}
+        <div className="absolute -bottom-2 -right-2 bg-yellow-400 rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+          <div className="w-2 h-2 bg-black rounded-full"></div>
+        </div>
+      </div>
+      <h1 className="mt-4 text-3xl font-extrabold text-gray-900 text-center">
+        Welcome Back
+      </h1>
+      <p className="text-sm text-gray-600 mt-2 text-center">
+        Observe everything. Miss nothing.
+      </p>
+    </div>
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 flex items-center">

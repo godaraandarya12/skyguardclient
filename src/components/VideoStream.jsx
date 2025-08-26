@@ -13,8 +13,8 @@ const VideoDashboard = () => {
   const videoJsRef = useRef(null);
 
   const CAM_NAME = 'cam1';
-  const API_BASE = 'http://localhost:3000';
-
+  const API_BASE = 'http://100.66.89.46:3000';
+  const device_ip= localStorage.getItem('device_ip')||sessionStorage.getItem('device_ip');
   // Fetch recordings from central server
   useEffect(() => {
     axios.get(`${API_BASE}/api/recordings/${CAM_NAME}`)
@@ -50,7 +50,7 @@ const VideoDashboard = () => {
   useEffect(() => {
     const video = hlsPlayerRef.current;
     const hls = new Hls();
-    const liveStreamUrl = `http://localhost:8888/${CAM_NAME}/index.m3u8`;
+    const liveStreamUrl = `http://${device_ip}:8888/${CAM_NAME}/index.m3u8`;
 
     if (Hls.isSupported() && video) {
       hls.loadSource(liveStreamUrl);

@@ -8,6 +8,7 @@ import {
 } from "react-icons/fi";
 import { RiLiveLine } from "react-icons/ri";
 import UserProfileCard from "./UserProfileCard";
+import Logo from '../../assets/logo.png'; // Adjust the path as necessary
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,10 +44,10 @@ export default function Sidebar() {
       name: "User Management",
       path: "/users",
       icon: <FiUsers size={18} />,
-      roles: ["admin"], // only visible for these roles
+      roles: ["Admin"], // only visible for these roles
       submenu: [
         { name: "All Users", path: "/users/all", icon: <FiUsers size={14} /> },
-        { name: "Add Users", path: "/users/add", icon: <FiSettings size={14} /> }
+        { name: "Add Users", path: "/users", icon: <FiSettings size={14} /> }
       ]
     },
     {
@@ -54,7 +55,7 @@ export default function Sidebar() {
       icon: <FiVideo size={18} />,
       submenu: [
         { name: "Recordings", path: "/recordings", icon: <FiVideo size={14} /> },
-        { name: "Live Streams", path: "/streams", icon: <RiLiveLine size={14} /> }
+        { name: "Live Streams", path: "/stream", icon: <RiLiveLine size={14} /> }
       ]
     },
     { name: "Scheduler", path: "/scheduler", icon: <FiCalendar size={18} /> },
@@ -64,7 +65,7 @@ export default function Sidebar() {
       path: "/devices",
       icon: <FiHardDrive size={18} />,
       status: "online",
-      roles: ["admin"] // only visible for these roles
+      roles: ["Admin"] // only visible for these roles
     },
     { name: "System Settings", path: "/settings", icon: <FiSettings size={18} /> }
   ];
@@ -123,9 +124,14 @@ export default function Sidebar() {
         {/* Logo & Close */}
         <div className="flex items-center justify-between p-6">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">SG</div>
-            <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent">Sky Guard</h2>
+ <div className="w-20 h-20 bg-gradient-to-br rounded-2xl flex items-center justify-center shadow-xl animate-bounce-slow">
+          <img 
+            src={Logo} 
+            alt="Logo" 
+            className="h-full w-full"
+          />
+        </div>            <div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent">CIVIEASE</h2>
               <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
                 <FiCloud size={12} className="mr-1" /> v1.0.0 <span className="mx-1">•</span> PRO
               </div>
@@ -202,7 +208,7 @@ export default function Sidebar() {
         <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800">
           <UserProfileCard />
           <div className="mt-4 flex justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>© 2025 Sky Guard</span>
+            <span>© 2025 CIVIEASE</span>
            
           </div>
         </div>

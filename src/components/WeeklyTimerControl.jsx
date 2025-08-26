@@ -5,11 +5,11 @@ import {
 } from 'react-icons/fi';
 
 const WeeklyTimerControl = () => {
-  const deviceId = localStorage.getItem('devices')|| sessionStorage.getItem('devices');
-  // Initial state for each day's timer settings
-  const deviceIp = localStorage.getItem('DeviceIp')|| sessionStorage.getItem('DeviceIp');
-  console.log(deviceIp);
-  console.log(deviceId);
+ 
+    const deviceId = localStorage.getItem("device") || sessionStorage.getItem("device");
+  const deviceIp = localStorage.getItem("DeviceIp") || sessionStorage.getItem("DeviceIp");
+
+ 
   const initialDayState = {
     enabled: false,
     startTime: '18:00',
@@ -53,7 +53,7 @@ const WeeklyTimerControl = () => {
     const fetchSchedule = async () => {
       
       try {
-        const response = await fetch(`http://${deviceIp}:3000/api/schedules?device_id=${deviceId}`);
+        const response = await fetch(`http://100.66.89.46:3000/api/schedules?device_id=${deviceId}`);
         console.log(response);
         const data = await response.json();
         if (Array.isArray(data)) {
@@ -132,7 +132,7 @@ const WeeklyTimerControl = () => {
     }));
 
     try {
-      const response = await fetch('http://localhost:3000/api/schedules', {
+      const response = await fetch('http://100.66.89.46:3000/api/schedules', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,24 +154,36 @@ const WeeklyTimerControl = () => {
 
   // Send restart command to device
   const sendRestartCommand = async () => {
-    setIsLoading(true);
-    setApiResponse('');
-    try {
-      const response = await fetch(`http://${deviceIp}:8000/api/restart`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const data = await response.json();
-      setApiResponse({ text: data.message || 'Restart command sent successfully!', type: 'success' });
-      setShowRestartButton(false); // Hide button after restart
-    } catch (error) {
-      setApiResponse({ text: `Error: ${error.message}`, type: 'error' });
-    } finally {
-      setIsLoading(false);
+  setIsLoading(true);
+  setApiResponse(null); // Clear previous response
+  try {
+    const response = await fetch(`http://${deviceIp}:5002/reboot`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
     }
-  };
+
+    const data = await response.json();
+    setApiResponse({
+      text: data.message || 'Restart command sent successfully!',
+      type: 'success',
+    });
+    setShowRestartButton(false); // Hide button after successful restart
+  } catch (error) {
+    setApiResponse({
+      text: `Error: ${error.message}`,
+      type: 'error',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+  
 
   // Render panel content
   const renderPanelContent = () => (
@@ -212,7 +224,7 @@ const WeeklyTimerControl = () => {
           <input 
             type="time" 
             id="bulkStartTime"
-            defaultValue="08:00"
+            defaultValue=""
           />
         </div>
         <div className="time-input-group">
@@ -220,7 +232,7 @@ const WeeklyTimerControl = () => {
           <input 
             type="time" 
             id="bulkStopTime"
-            defaultValue="17:00"
+            defaultValue=""
           />
         </div>
         <button 

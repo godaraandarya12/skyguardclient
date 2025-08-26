@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { FiUser, FiSave, FiEye, FiEyeOff, FiLink, FiShield, FiClock, FiCalendar } from 'react-icons/fi';
 
 const SettingsPage = () => {
-  const deviceid = "GAST2ccf672af4ea";
+  const deviceid = localStorage.getItem("device") || sessionStorage.getItem("device");
   const [formData, setFormData] = useState({
     name: '',
     email: '',

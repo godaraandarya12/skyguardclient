@@ -23,12 +23,13 @@ const LiveStream = ({ initialCamera = 'cam1' }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const mediaRecorderRef = useRef(null);
   const recordedChunksRef = useRef([]);
+  const deviceIP = localStorage.getItem("DeviceIp") || sessionStorage.getItem("DeviceIp");
+
 
   const cameras = [
-    { id: 'cam1', name: 'Main Entrance', url: 'http://100.66.89.46:8889/cam1' },
-    { id: 'cam2', name: 'Parking Lot', url: 'http://100.66.89.46:8888/cam1/index.m3u8' },
-    { id: 'cam3', name: 'Lobby Area', url: 'http://localhost:3000/hls/cam3/index.m3u8' },
-    { id: 'cam4', name: 'Security Desk', url: 'http://localhost:3000/hls/cam4/index.m3u8' },
+    { id: 'cam1', name: 'cam1', url: `http://${deviceIP}:8888/cam1/index.m3u8` },
+    { id: 'cam2', name: 'cam2', url: `http://${deviceIP}:8888/cam2/index.m3u8` },
+   
   ];
 
   const isHls = (url) => url.endsWith('.m3u8');

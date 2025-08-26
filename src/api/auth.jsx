@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'http://localhost:3000' }); // Change this to your backend URL
+const API = axios.create({ baseURL: 'http://100.66.89.46:3000' }); // Change this to your backend URL
 
 export const login = (data) => API.post('/api/auth/login', data);
 export const signup = (data) => API.post('/api/auth/signup', data);

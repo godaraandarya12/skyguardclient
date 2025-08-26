@@ -25,6 +25,7 @@ const Notification = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const deviceId = localStorage.getItem("device") || sessionStorage.getItem("device");
 
   const notificationsPerPage = 8;
 
@@ -37,7 +38,7 @@ const Notification = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://localhost:3000/api/notifications/GAST2ccf672af4ea');
+        const response = await fetch(`http://100.66.89.46:3000/api/notifications/${deviceId}`);
         if (!response.ok) throw new Error('Failed to fetch notifications');
 
         const { data } = await response.json();
@@ -77,7 +78,7 @@ const Notification = () => {
   const toggleReadStatus = useCallback(async (id) => {
     try {
       const notification = notifications.find(n => n.id === id);
-      const response = await fetch(`http://localhost:3000/api/notifications/${id}/read`, {
+      const response = await fetch(`http://100.66.89.46:3000/api/notifications/${id}/read`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read: !notification.read }),

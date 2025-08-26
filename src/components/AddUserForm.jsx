@@ -106,7 +106,7 @@ const AddUserForm = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/add-child', formData);
+      const response = await axios.post('http://100.66.89.46:3000/api/auth/add-child', formData);
 
       setSuccess('User created successfully!');
 

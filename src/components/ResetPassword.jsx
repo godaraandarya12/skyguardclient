@@ -18,7 +18,7 @@ export default function ResetPassword() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/reset-password", {
+      const res = await axios.post("http://100.66.89.46:3000/api/auth/reset-password", {
         email,
         token,
         newPassword: password

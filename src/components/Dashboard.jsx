@@ -577,10 +577,10 @@ export default function Dashboard() {
     }
   }, []);
   const fetchHealthData = async () => {
-    console.log(`http://${deviceIP}:8000/health`);
+    console.log(`http://${deviceIP}:5002/health`);
     console.log(`Device ID: ${deviceId}`);
     try {
-      const res = await axios.get(`http://${deviceIP}:8000/health`);
+      const res = await axios.get(`http://${deviceIP}:5002/health`);
       
       
       setSystemData(res.data);
@@ -601,7 +601,7 @@ export default function Dashboard() {
       const startDateStr = startDate.toISOString().split('T')[0];
 
       const res = await axios.get(
-        `http://localhost:3000/api/notifications/summary?startDate=${startDateStr}&endDate=${endDate}&device_id=${deviceId}`
+        `http://100.66.89.46:3000/api/notifications/summary?startDate=${startDateStr}&endDate=${endDate}&device_id=${deviceId}`
       );
       setNotificationData(res.data.data);
       setErrorNotifications(null);

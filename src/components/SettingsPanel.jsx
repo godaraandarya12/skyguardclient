@@ -33,7 +33,7 @@ const SettingsPanel = ({
         </div>
 
         {/* Stream Quality */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="flex items-center gap-2 mb-2">
             <FiVideo /> Stream Quality
           </label>
@@ -48,7 +48,7 @@ const SettingsPanel = ({
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         {/* Auto Reconnect */}
         <div className="mb-4">
@@ -64,7 +64,7 @@ const SettingsPanel = ({
         </div>
 
         {/* Volume Control */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="flex items-center gap-2 mb-2">
             <FiVolume2 /> Volume
           </label>
@@ -77,7 +77,7 @@ const SettingsPanel = ({
             className="w-full"
           />
           <span>{volume}%</span>
-        </div>
+        </div> */}
 
         {/* Brightness Control */}
         <div className="mb-4">

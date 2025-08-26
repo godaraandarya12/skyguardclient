@@ -23,7 +23,7 @@ const DevicesPage = () => {
     rtspUrl2: '',
     ipAddress: ''
   });
-const searchedDeviceId = searchParams.get("deviceId");
+const searchedDeviceId = searchParams.get("userId");
   
  // Set search term from URL param only on mount or when param changes
   useEffect(() => {
@@ -34,7 +34,7 @@ const searchedDeviceId = searchParams.get("deviceId");
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/DeviceRegister/devices');
+        const response = await axios.get('http://100.66.89.46:3000/api/DeviceRegister/devices');
         if (response.data && Array.isArray(response.data.data)) {
           setDevices(response.data.data);
         } else {
@@ -57,16 +57,16 @@ const searchedDeviceId = searchParams.get("deviceId");
     try {
       const payload = {
         deviceId: newDevice.deviceId,
-        device_name: newDevice.deviceName,
+        deviceName: newDevice.deviceName,
         device_type: newDevice.deviceType,
-        rtsp_url1: newDevice.rtspUrl1,
-        rtsp_url2: newDevice.rtspUrl2,
-        ip_address: newDevice.ipAddress,
+        rtspUrl1: newDevice.rtspUrl1,
+        rtspUrl2: newDevice.rtspUrl2,
+        ipAddress: newDevice.ipAddress,
         status: 'active' // Default status for new devices
       };
 
       console.log("📤 Sending Add Payload:", JSON.stringify(payload));
-      const response = await axios.post('http://localhost:3000/api/DeviceRegister', payload, {
+      const response = await axios.post('http://100.66.89.46:3000/api/DeviceRegister', payload, {
         headers: { 'Content-Type': 'application/json' }
       });
 
@@ -83,7 +83,7 @@ const searchedDeviceId = searchParams.get("deviceId");
       alert('Device added successfully!');
     } catch (error) {
       console.error('Error adding device:', error.response?.data || error.message);
-      alert('Failed to add device. Please check the input and try again.');
+      alert('Failed to add device.,' ,error.response?.data );
     }
   };
 
@@ -116,7 +116,7 @@ const searchedDeviceId = searchParams.get("deviceId");
 
       console.log("📤 Sending Update Payload:", JSON.stringify(payload));
       const response = await axios.put(
-        `http://localhost:3000/api/DeviceRegister/${editDevice.device_id}`,
+        `http://100.66.89.46:3000/api/DeviceRegister/${editDevice.device_id}`,
         payload,
         {
           headers: { 'Content-Type': 'application/json' }
@@ -150,7 +150,7 @@ const searchedDeviceId = searchParams.get("deviceId");
   const confirmAction = async () => {
     try {
       if (actionType === 'delete') {
-        await axios.delete(`http://localhost:3000/api/DeviceRegister/${selectedDevice.device_id}`, {
+        await axios.delete(`http://100.66.89.46:3000/api/DeviceRegister/${selectedDevice.device_id}`, {
           headers: { 'Content-Type': 'application/json' }
         });
         setDevices(devices.filter(d => d.device_id !== selectedDevice.device_id));
@@ -158,7 +158,7 @@ const searchedDeviceId = searchParams.get("deviceId");
       } else {
         const newStatus = actionType === 'deactivate' ? 'inactive' : 'active';
         await axios.patch(
-          `http://localhost:3000/api/DeviceRegister/${selectedDevice.device_id}/status`,
+          `http://100.66.89.46:3000/api/DeviceRegister/${selectedDevice.device_id}/status`,
           { status: newStatus },
           { headers: { 'Content-Type': 'application/json' } }
         );
